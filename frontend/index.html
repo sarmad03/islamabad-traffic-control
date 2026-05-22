@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Islamabad Smart Traffic Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+      <span>ISB Traffic</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-view="dashboard">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" data-view="routes">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12h18M3 6l9-3 9 3M3 18l9 3 9-3"/></svg>
+        Route Planner
+      </button>
+      <button class="nav-item" data-view="signals">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="6" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="18" r="2"/><rect x="8" y="2" width="8" height="20" rx="2" stroke-width="1.5"/></svg>
+        Signal Control
+      </button>
+    </nav>
+
+    <div class="sidebar-controls">
+      <div class="section-label">Simulation</div>
+      <button class="ctrl-btn" id="btnPlayPause">
+        <svg id="iconPause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        <svg id="iconPlay" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><polygon points="5,3 19,12 5,21"/></svg>
+        <span id="playLabel">Pause</span>
+      </button>
+
+      <div class="section-label" style="margin-top:1.25rem;">Emergency</div>
+      <button class="ctrl-btn accent" id="btnEmerg">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span id="emergLabel">Trigger Emergency</span>
+      </button>
+
+      <div class="section-label" style="margin-top:1.25rem;">Accident</div>
+      <button class="ctrl-btn danger" id="btnAccident">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span id="accLabel">Simulate Accident</span>
+      </button>
+    </div>
+
+    <div class="sidebar-status">
+      <div class="conn-dot" id="connDot"></div>
+      <span id="connLabel">Connecting...</span>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- DASHBOARD VIEW -->
+    <div class="view active" id="view-dashboard">
+
+      <header class="page-header">
+        <div>
+          <h1>Traffic Overview</h1>
+          <p class="subtitle">Real-time AI-managed signal control · Islamabad</p>
+        </div>
+        <div class="step-chip">
+          <span class="live-pulse"></span>
+          STEP <span id="stepNum">000</span>
+        </div>
+      </header>
+
+      <!-- METRIC CARDS -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon blue">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div>
+            <div class="metric-label">Avg Density</div>
+            <div class="metric-val" id="mAvg">—</div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon red">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 22 20 2 20"/></svg>
+          </div>
+          <div>
+            <div class="metric-label">Congested Zones</div>
+            <div class="metric-val" id="mCong">—</div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon green">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          </div>
+          <div>
+            <div class="metric-label">Green Signals</div>
+            <div class="metric-val" id="mGreen">—</div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon amber">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div>
+            <div class="metric-label">Active Accidents</div>
+            <div class="metric-val" id="mAcc">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NODE TABLE -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Network Nodes</span>
+          <span class="card-badge">Live</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Location</th>
+                <th>Signal</th>
+                <th>Green Time</th>
+                <th>Density</th>
+                <th>Prediction</th>
+                <th>AI Action</th>
+              </tr>
+            </thead>
+            <tbody id="nodeTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BOTTOM ROW -->
+      <div class="bottom-grid">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">System Alerts</span>
+          </div>
+          <div id="alertsList" class="alerts-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">AI Route Suggestion</span>
+            <span class="route-meta">Faizabad → Faisal Mosque</span>
+          </div>
+          <div class="route-display" id="routeDisplay"></div>
+          <div class="route-cost">
+            <span class="cost-label">Congestion weight</span>
+            <span class="cost-val" id="routeCost">—</span>
+          </div>
+          <div id="emergRouteSection" style="display:none;margin-top:1rem;">
+            <div class="card-header" style="padding:0 0 0.5rem;">
+              <span class="card-title emerg-title">🚑 Emergency Route Active</span>
+            </div>
+            <div class="route-display" id="emergRouteDisplay"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROUTE PLANNER VIEW -->
+    <div class="view" id="view-routes">
+      <header class="page-header">
+        <div>
+          <h1>Route Planner</h1>
+          <p class="subtitle">AI-powered Dijkstra routing with live traffic awareness</p>
+        </div>
+      </header>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Plan a Route</span></div>
+        <div class="route-form">
+          <div class="form-group">
+            <label>From</label>
+            <select id="routeFrom"></select>
+          </div>
+          <div class="form-group">
+            <label>To</label>
+            <select id="routeTo"></select>
+          </div>
+          <button class="ctrl-btn blue" id="btnCalcRoute">Calculate Route</button>
+        </div>
+        <div id="routeResult" class="route-result" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- SIGNAL CONTROL VIEW -->
+    <div class="view" id="view-signals">
+      <header class="page-header">
+        <div>
+          <h1>Signal Control</h1>
+          <p class="subtitle">Per-node signal states and AI timing decisions</p>
+        </div>
+      </header>
+      <div class="signals-grid" id="signalsGrid"></div>
+    </div>
+
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
